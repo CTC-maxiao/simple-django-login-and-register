@@ -1,0 +1,148 @@
+1. 遍历 /opt/mstr/test_1 文件夹下的所有文件，并获取文件的md5值，将结果保存到/opt/mstr/result/result_1.json中。文件路径为相对路径。程序保存为/opt/mstr/result/script_1.py。
+可以直接使用提供的get_file_md5()获取文件md5值。
+python 遍历文件夹下的所有文件可以使用os.walk()。
+python可以使用json.load(f)从文件中加载json，使用json.dump(dict,f)将json写入文件。
+
+######
+result_1.json的参考格式如下：
+{
+	"readme.txt": "10d1644e7bcb8c8d9bb4b4583e3b45bb",
+	"configs/params.json": "3086544e7bcb8c8d9bb4b4583e3c6ddc",
+	"logs/backup_log/20201039.log": "5186544e7bcb8c8d8ff4b4583e3c6651"
+}
+#######
+
+import os
+import json
+import hashlib
+
+def get_file_md5(file_path):
+    with open(file_path, 'rb') as fp:
+        data = fp.read()
+    file_md5= hashlib.md5(data).hexdigest()
+
+    return file_md5
+
+def scan_file_md5(scan_dir):
+	result_json = {}
+	"""
+	code
+	"""
+
+	return result_json
+
+def dump_json(result_dict,file_path):
+	"""
+	code
+	"""
+
+2. 读取上题生成的 /opt/mstr/result/result_1.json, 并遍历/opt/mstr/test_2文件夹。
+找出两个文件夹中相对路径相同但md5值不同的文件，以及在test_1文件夹中但不在test_2文件夹中的文件，将找到的文件名保存到/opt/mstr/result/result_2.txt中。程序保存为/opt/mstr/result/script_2.py。
+
+##########
+例如：
+假如test_1下有这些文件:
+    readme.txt: "10d1644e7bcb8c8d9bb4b4583e3b45bb"
+    configs/params.json: "3086544e7bcb8c8d9bb4b4583e3c6ddc"
+    logs/backup_log/20201039.log: "5186544e7bcb8c8d8ff4b4583e3c6651"
+    version.txt: "9756544e7bcb8c8d8ff4b4583e3caasd"
+
+假如test_2下有这些文件:
+    readme.txt: "10d1644e7bcb8c8d9bb4b4583e3b45bb"
+    configs/params.json: "aabb544e7bcb8c8d9bb4b4583e36655v"
+    test.py: "20d1644e7bcb8c8d9bb4b4583e3b46vv"
+那么result_2.txt就为：
+configs/params.json
+version.txt
+##########
+
+#直接使用上题中的函数
+def scan_file_md5(scan_dir):
+	result_json = {}
+	"""
+	code
+	"""
+
+	return result_json
+
+def load_json(file_path):
+	result_dict = {}
+	"""
+	code
+	"""
+
+	return result_dict
+
+def compare_dir_md5(result1,result2):
+	file_list = []
+	"""
+	code
+	"""
+
+	return file_list
+
+def write_to_file(result_list,file_path):
+	"""
+	code
+	"""
+
+
+
+
+参考答案：
+import os
+import json
+import hashlib
+
+def get_file_md5(file_path):
+    with open(file_path, 'rb') as fp:
+        data = fp.read()
+    file_md5= hashlib.md5(data).hexdigest()
+
+    return file_md5
+
+def scan_file_md5(scan_dir):
+    local_dict = {}
+
+    for root,dirs,files in os.walk(scan_dir):
+        for _file in files:
+            full_path = os.path.join(root,_file)
+            if os.path.isfile(full_path):
+                local_dict[full_path.replace(scan_dir+"/","")] = get_file_md5(full_path)
+
+    return local_dict
+
+def dump_json(result_dict,file_path):
+	with open(file_path,"w") as f:
+		json.dump(result_dict,f)
+
+def load_json(file_path):
+	result_dict = {}
+	with open(file_path,"r") as f:
+		result_dict = json.load(f)
+
+	return result_dict
+
+def compare_dir_md5(result1,result2):
+	file_list = []
+	for key,value in result1.items():
+		if key in result2.keys():
+			if value != result2[key]:
+				file_list.append(key)
+		else:
+			file_list.append(key)
+
+	return file_list
+
+def write_to_file(result_list,file_path):
+	with open(file_path,"w") as f:
+		for line in result_list.readlines():
+			f.write(line)
+
+result = scan_file_md5("/opt/mstr/test_1")
+dump_json(result,"/opt/mstr/result_1.json")
+
+result_1 = load_json("/opt/mstr/result_1.json")
+result_2 = scan_file_md5("/opt/mstr/test_2")
+file_list = compare_dir_md5(result_1,result_2)
+write_to_file(file_list,"/opt/mstr/result/result_2.txt")
